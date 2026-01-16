@@ -1,0 +1,49 @@
+name: Full Project Deployment
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # PARTIE WORDPRESS 
+      - name: Kompose & Zip WordPress
+        run: |
+          curl -L https://github.com/kubernetes/kompose/releases/download/v1.32.0/kompose-linux-amd64 -o kompose
+          chmod +x kompose
+          cd Wordpress 
+          mkdir -p BoudjemaDyhia
+          ../kompose convert -f docker-compose.yml -o BoudjemaDyhia/
+          zip -r ../BoudjemaDyhiaWordpress.zip BoudjemaDyhia/
+          cd ..
+
+      # PARTIE PYTHON 
+      - name: Test & Zip Python
+        run: |
+          cd Python 
+          pip install pytest
+          pytest tests/ 
+          mkdir -p BoudjemaDyhiaPython
+          cp api.py db.py utils.py requirements.txt Dockerfile docker-compose.yml BoudjemaDyhiaPython/
+          cp -r tests BoudjemaDyhiaPython/
+          zip -r ../BoudjemaDyhiaPython.zip BoudjemaDyhiaPython/
+          cd ..
+
+      # REGROUPEMENT ET ENVOI 
+      - name: Prepare and Upload
+        run: |
+          mkdir -p final_upload
+          mv BoudjemaDyhiaWordpress.zip BoudjemaDyhiaPython.zip final_upload/
+
+      - name: Déploiement FTP Final
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./final_upload/
+          server-dir: RenduDevopsKube/
+          dangerous-clean-slate: false # Sécurité pour les fichiers des autres
+          state-name: "none" # Ignore l'historique pour ne rien supprimer
