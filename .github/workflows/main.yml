@@ -15,7 +15,6 @@ jobs:
           curl -L https://github.com/kubernetes/kompose/releases/download/v1.32.0/kompose-linux-amd64 -o kompose
           chmod +x kompose
           cd Wordpress
-          # On crée le fichier manquant pour éviter l'erreur FATA
           echo "${{ secrets.MYSQL_ROOT_PASSWORD }}" > password.txt
           mkdir -p BoudjemaDyhia
           ../kompose convert -f docker-compose.yml -o BoudjemaDyhia/
@@ -27,10 +26,8 @@ jobs:
         run: |
           cd Python
           pip install pytest
-          # Utilise le test de vérification de fichiers pour éviter les ModuleNotFound
           pytest tests/ 
           mkdir -p BoudjemaDyhiaPython
-          # On copie proprement les fichiers pour éviter l'erreur de boucle infinie
           cp api.py db.py utils.py requirements.txt Dockerfile docker-compose.yml BoudjemaDyhiaPython/
           cp -r tests BoudjemaDyhiaPython/
           zip -r ../BoudjemaDyhiaPython.zip BoudjemaDyhiaPython/
