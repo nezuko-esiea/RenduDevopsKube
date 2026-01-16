@@ -31,7 +31,7 @@ jobs:
           
       - name: Créer le dossier et le ZIP du rendu
         run: |
-        
+          cd Wordpress
           mkdir -p BoudjemaDyhia
           cp out-k8s/* BoudjemaDyhia/
           mkdir -p deploy_folder

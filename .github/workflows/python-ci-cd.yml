@@ -32,6 +32,7 @@
 #       - uses: actions/checkout@v4
 #       - name: Créer le ZIP du rendu
 #         run: |
+#            cd Python
 #           mkdir -p BoudjemaDyhia
 #           cp *.py requirements.txt BoudjemaDyhia/
 #           mkdir -p deploy_py
