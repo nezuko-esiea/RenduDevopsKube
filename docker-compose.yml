@@ -28,7 +28,7 @@ services:
       - db-password
     volumes:
       - wordpress-data:/var/lib/wordpress/html
-
+# Définition des secrets
 secrets:
   db-password:
     file: ./password.txt
