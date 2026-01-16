@@ -1,5 +1,4 @@
 name: WordPress Kube CI/CD
-
 on:
   push:
     branches: [ main ]
@@ -27,25 +26,29 @@ jobs:
           export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
           kompose convert -f docker-compose.yml -o out-k8s/
           
+      - name: Créer le dossier et le ZIP du rendu
+        run: |
+          mkdir -p BoudjemaDyhia
+          cp out-k8s/* BoudjemaDyhia/
+          zip -r BoudjemaDyhiaWordpress.zip BoudjemaDyhia/
 
-      - name: Upload Artifacts
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: kube-manifests
-          path: out-k8s/
-
-  # DÉPLOIEMENT (CD)
+          name: wp-zip
+          path: BoudjemaDyhiaWordpress.zip
+  # Déploiement (CD)
   deploy:
     name: Déploiement FTP (OVH)
     needs: build-and-convert
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Télécharger les manifestes
+      - name: Télécharger le ZIP
         uses: actions/download-artifact@v4
         with:
-          name: kube-manifests
-          path: ./dist
+          name: wp-zip
+          path: ./dist-zip
 
       - name: Déploiement FTP vers OVH
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -53,5 +56,5 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/
-          server-dir: RenduDevopsKube/BoudjemaDyhiaWordpress/
+          local-dir: ./dist-zip/
+          server-dir: RenduDevopsKube/
