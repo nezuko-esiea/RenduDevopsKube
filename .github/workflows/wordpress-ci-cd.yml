@@ -31,7 +31,7 @@ jobs:
           
       - name: Créer le dossier et le ZIP du rendu
         run: |
-          cd Wordpress
+         
           mkdir -p BoudjemaDyhia
           cp out-k8s/* BoudjemaDyhia/
           mkdir -p deploy_folder
@@ -41,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v4  
         with:
           name: wp-zip-payload
-          path: deploy_folder/
+          path: Wordpress/deploy_folder/
   # Déploiement (CD)
   deploy:
     name: Déploiement FTP (OVH)
