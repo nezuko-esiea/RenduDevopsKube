@@ -60,3 +60,4 @@ jobs:
           local-dir: ./to-ftp/
           server-dir: RenduDevopsKube/
           dangerous-clean-slate: false
+          state-name: "none"
