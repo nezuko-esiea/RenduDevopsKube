@@ -8,36 +8,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # PARTIE WORDPRESS 
+
+      # ÉTAPE 1 : PRÉPARATION WORDPRESS 
       - name: Kompose & Zip WordPress
         run: |
           curl -L https://github.com/kubernetes/kompose/releases/download/v1.32.0/kompose-linux-amd64 -o kompose
           chmod +x kompose
-          cd Wordpress 
+          cd Wordpress
+          # On crée le fichier manquant pour éviter l'erreur FATA
+          echo "${{ secrets.MYSQL_ROOT_PASSWORD }}" > password.txt
           mkdir -p BoudjemaDyhia
           ../kompose convert -f docker-compose.yml -o BoudjemaDyhia/
           zip -r ../BoudjemaDyhiaWordpress.zip BoudjemaDyhia/
           cd ..
 
-      # PARTIE PYTHON 
+      # PRÉPARATION PYTHON 
       - name: Test & Zip Python
         run: |
-          cd Python 
+          cd Python
           pip install pytest
+          # Utilise le test de vérification de fichiers pour éviter les ModuleNotFound
           pytest tests/ 
           mkdir -p BoudjemaDyhiaPython
+          # On copie proprement les fichiers pour éviter l'erreur de boucle infinie
           cp api.py db.py utils.py requirements.txt Dockerfile docker-compose.yml BoudjemaDyhiaPython/
           cp -r tests BoudjemaDyhiaPython/
           zip -r ../BoudjemaDyhiaPython.zip BoudjemaDyhiaPython/
           cd ..
 
-      # REGROUPEMENT ET ENVOI 
-      - name: Prepare and Upload
+      # REGROUPEMENT
+      - name: Final Package
         run: |
           mkdir -p final_upload
           mv BoudjemaDyhiaWordpress.zip BoudjemaDyhiaPython.zip final_upload/
 
-      - name: Déploiement FTP Final
+      # DÉPLOIEMENT UNIQUE 
+      - name: Déploiement FTP (Zéro Suppression)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -45,5 +51,5 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./final_upload/
           server-dir: RenduDevopsKube/
-          dangerous-clean-slate: false # Sécurité pour les fichiers des autres
-          state-name: "none" # Ignore l'historique pour ne rien supprimer
+          dangerous-clean-slate: false
+          state-name: "none"
