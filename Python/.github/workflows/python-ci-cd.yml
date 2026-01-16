@@ -1,0 +1,45 @@
+# name: Python Data CI/CD
+
+# on:
+#   push:
+#     branches: [ main ]
+
+# jobs:
+#   # Tests et Qualité 
+#   tests:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - name: Setup Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: "3.11"
+#       - name: Installer les dépendances
+#         run: |
+#           pip install -r requirements.txt
+#           pip install pytest
+#       - name: Lancer les tests
+#         run: pytest
+
+#   #  Création du ZIP et Envoi
+#   deploy:
+#     needs: tests
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - name: Créer le ZIP du rendu
+#         run: |
+#           mkdir -p BoudjemaDyhia
+#           cp *.py requirements.txt BoudjemaDyhia/
+#           mkdir -p deploy_py
+#           zip -r deploy_py/BoudjemaDyhiaPython.zip BoudjemaDyhia/
+
+#       - name: Déploiement FTP
+#         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+#         with:
+#           server: ${{ secrets.FTP_SERVER }}
+#           username: ${{ secrets.FTP_USERNAME }}
+#           password: ${{ secrets.FTP_PASSWORD }}
+#           local-dir: ./deploy_py/
+#           server-dir: RenduDevopsKube/
+#           delete-removed: false
