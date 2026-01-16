@@ -1,0 +1,57 @@
+name: WordPress Kube CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # GÉNÉRATION DES MANIFESTES (CI)
+  build-and-convert:
+    name: Build & Kompose Conversion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Installer Kompose
+        run: |
+          curl -L https://github.com/kubernetes/kompose/releases/download/v1.32.0/kompose-linux-amd64 -o kompose
+          chmod +x kompose
+          sudo mv kompose /usr/local/bin/kompose
+
+      - name: Convertir Docker Compose
+        run: |
+          mkdir out-k8s
+          export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+          kompose convert -f docker-compose.yml -o out-k8s/
+          
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: kube-manifests
+          path: out-k8s/
+
+  # DÉPLOIEMENT (CD)
+  deploy:
+    name: Déploiement FTP (OVH)
+    needs: build-and-convert
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Télécharger les manifestes
+        uses: actions/download-artifact@v4
+        with:
+          name: kube-manifests
+          path: ./dist
+
+      - name: Déploiement FTP vers OVH
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist/
+          server-dir: RenduDevopsKube/BoudjemaDyhiaWordpress/
