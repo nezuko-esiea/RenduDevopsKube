@@ -1,49 +1,39 @@
-# name: Python Data CI/CD
+name: Python Data CI/CD
+on:
+  push:
+    branches: [ main ]
 
-# on:
-#   push:
-#     branches: [ main ]
+jobs:
+  test-and-package:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Python # On cible le dossier Python
+    steps:
+      - uses: actions/checkout@v4
 
-# jobs:
-#   # Tests et Qualité 
-#   tests:
-#     runs-on: ubuntu-latest
-#     defaults:
-#       run:
-#         working-directory: ./Python
-#     steps:
-#       - uses: actions/checkout@v4
-#       - name: Setup Python
-#         uses: actions/setup-python@v5
-#         with:
-#           python-version: "3.11"
-#       - name: Installer les dépendances
-#         run: |
-#           pip install -r requirements.txt
-#           pip install pytest
-#       - name: Lancer les tests
-#         run: pytest
+      - name: Installer les dépendances
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
 
-#   #  Création du ZIP et Envoi
-#   deploy:
-#     needs: tests
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v4
-#       - name: Créer le ZIP du rendu
-#         run: |
-#            cd Python
-#           mkdir -p BoudjemaDyhia
-#           cp *.py requirements.txt BoudjemaDyhia/
-#           mkdir -p deploy_py
-#           zip -r deploy_py/BoudjemaDyhiaPython.zip BoudjemaDyhia/
+      - name: Lancer les Tests (Le piège de la prof)
+        run: pytest tests/
 
-#       - name: Déploiement FTP
-#         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-#         with:
-#           server: ${{ secrets.FTP_SERVER }}
-#           username: ${{ secrets.FTP_USERNAME }}
-#           password: ${{ secrets.FTP_PASSWORD }}
-#           local-dir: ./deploy_py/
-#           server-dir: RenduDevopsKube/
-#           delete-removed: false
+      - name: Créer le ZIP Python
+        run: |
+          mkdir -p BoudjemaDyhiaPython
+          # Copie tout sauf les environnements virtuels
+          cp -r . BoudjemaDyhiaPython/
+          zip -r ../BoudjemaDyhiaPython.zip BoudjemaDyhiaPython/
+
+      - name: Déploiement FTP (Sécurisé)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./ 
+          server-dir: RenduDevopsKube/
+          dangerous-clean-slate: false # Ne pas effacer Wordpress !
+          state-name: "none"
