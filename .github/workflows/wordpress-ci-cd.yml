@@ -10,6 +10,9 @@ jobs:
   build-and-convert:
     name: Build & Kompose Conversion
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Wordpress
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
@@ -22,20 +25,20 @@ jobs:
 
       - name: Convertir Docker Compose
         run: |
-          cd Wordpress
           mkdir out-k8s
           echo "${{ secrets.MYSQL_ROOT_PASSWORD }}" > password.txt
           kompose convert -f docker-compose.yml -o out-k8s/
           
       - name: Créer le dossier et le ZIP du rendu
         run: |
+        
           mkdir -p BoudjemaDyhia
           cp out-k8s/* BoudjemaDyhia/
           mkdir -p deploy_folder
           zip -r deploy_folder/BoudjemaDyhiaWordpress.zip BoudjemaDyhia/
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4  
         with:
           name: wp-zip-payload
           path: deploy_folder/

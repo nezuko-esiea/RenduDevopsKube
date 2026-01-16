@@ -8,6 +8,9 @@
 #   # Tests et Qualité 
 #   tests:
 #     runs-on: ubuntu-latest
+#     defaults:
+#       run:
+#         working-directory: ./Python
 #     steps:
 #       - uses: actions/checkout@v4
 #       - name: Setup Python
