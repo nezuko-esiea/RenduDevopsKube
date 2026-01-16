@@ -5,35 +5,54 @@ on:
 
 jobs:
   test-and-package:
+    name: Test & Package Python
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./Python # On cible le dossier Python
+        working-directory: ./Python 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Installer les dépendances
-        run: |
-          pip install -r requirements.txt
-          pip install pytest
+      - name: Installer Pytest
+        run: pip install pytest
 
-      - name: Lancer les Tests (Le piège de la prof)
+      - name: Lancer les Tests
         run: pytest tests/
 
-      - name: Créer le ZIP Python
+      - name: Créer le dossier et le ZIP du rendu
         run: |
-          mkdir -p BoudjemaDyhiaPython
-          # Copie tout sauf les environnements virtuels
-          cp -r . BoudjemaDyhiaPython/
-          zip -r ../BoudjemaDyhiaPython.zip BoudjemaDyhiaPython/
+          mkdir -p deploy_folder/BoudjemaDyhiaPython
+          
+          cp api.py db.py utils.py requirements.txt Dockerfile docker-compose.yml deploy_folder/BoudjemaDyhiaPython/
+          cp -r tests deploy_folder/BoudjemaDyhiaPython/
+          
+          cd deploy_folder
+          zip -r BoudjemaDyhiaPython.zip BoudjemaDyhiaPython/
 
-      - name: Déploiement FTP (Sécurisé)
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4  
+        with:
+          name: py-zip-payload
+          path: Python/deploy_folder/BoudjemaDyhiaPython.zip
+
+  deploy:
+    name: Déploiement FTP (OVH)
+    needs: test-and-package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Télécharger le ZIP
+        uses: actions/download-artifact@v4
+        with:
+          name: py-zip-payload
+          path: ./to-ftp
+
+      - name: Déploiement FTP vers OVH
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./ 
+          local-dir: ./to-ftp/
           server-dir: RenduDevopsKube/
-          dangerous-clean-slate: false # Ne pas effacer Wordpress !
+          dangerous-clean-slate: false # Crucial pour garder Wordpress
           state-name: "none"
