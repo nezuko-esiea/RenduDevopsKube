@@ -22,6 +22,7 @@ jobs:
 
       - name: Convertir Docker Compose
         run: |
+          cd Wordpress
           mkdir out-k8s
           echo "${{ secrets.MYSQL_ROOT_PASSWORD }}" > password.txt
           kompose convert -f docker-compose.yml -o out-k8s/
