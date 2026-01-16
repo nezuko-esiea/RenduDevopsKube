@@ -30,13 +30,14 @@ jobs:
         run: |
           mkdir -p BoudjemaDyhia
           cp out-k8s/* BoudjemaDyhia/
-          zip -r BoudjemaDyhiaWordpress.zip BoudjemaDyhia/
+          mkdir -p deploy_folder
+          zip -r deploy_folder/BoudjemaDyhiaWordpress.zip BoudjemaDyhia/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: wp-zip
-          path: BoudjemaDyhiaWordpress.zip
+          name: wp-zip-payload
+          path: deploy_folder/
   # Déploiement (CD)
   deploy:
     name: Déploiement FTP (OVH)
@@ -47,8 +48,8 @@ jobs:
       - name: Télécharger le ZIP
         uses: actions/download-artifact@v4
         with:
-          name: wp-zip
-          path: ./dist-zip
+          name: wp-zip-payload
+          path: ./to-ftp
 
       - name: Déploiement FTP vers OVH
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -56,5 +57,6 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist-zip/
+          local-dir: ./to-ftp/
           server-dir: RenduDevopsKube/
+          delete-removed: false
