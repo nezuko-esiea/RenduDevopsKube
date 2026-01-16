@@ -23,7 +23,7 @@ jobs:
       - name: Convertir Docker Compose
         run: |
           mkdir out-k8s
-          export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+          echo "${{ secrets.MYSQL_ROOT_PASSWORD }}" > password.txt
           kompose convert -f docker-compose.yml -o out-k8s/
           
       - name: Créer le dossier et le ZIP du rendu
