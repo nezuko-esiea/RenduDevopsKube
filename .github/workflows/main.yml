@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ÉTAPE 1 : PRÉPARATION WORDPRESS 
+      # PRÉPARATION WORDPRESS 
       - name: Kompose & Zip WordPress
         run: |
           curl -L https://github.com/kubernetes/kompose/releases/download/v1.32.0/kompose-linux-amd64 -o kompose
@@ -22,14 +22,14 @@ jobs:
           cd ..
 
       # PRÉPARATION PYTHON 
-      - name: Test & Zip Python
+      - name: Test, Kompose & Zip Python
         run: |
           cd Python
           pip install pytest
           pytest tests/ 
           mkdir -p BoudjemaDyhiaPython
-          cp api.py db.py utils.py requirements.txt Dockerfile docker-compose.yml BoudjemaDyhiaPython/
-          cp -r tests BoudjemaDyhiaPython/
+          ../kompose convert -f docker-compose.yml -o BoudjemaDyhiaPython/
+          
           zip -r ../BoudjemaDyhiaPython.zip BoudjemaDyhiaPython/
           cd ..
 
