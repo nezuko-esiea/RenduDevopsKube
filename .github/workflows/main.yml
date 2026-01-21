@@ -39,7 +39,7 @@ jobs:
           mkdir -p final_upload
           mv BoudjemaDyhiaWordpress.zip BoudjemaDyhiaPython.zip final_upload/
 
-      # DÉPLOIEMENT UNIQUE 
+      # DÉPLOIEMENT UNIQUE-
       - name: Déploiement FTP (Zéro Suppression)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
