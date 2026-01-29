@@ -3,7 +3,7 @@
 Ce dépôt regroupe l'ensemble des travaux pratiques réalisés. Le pipeline CI/CD sur cette branche est configuré pour gérer le déploiement multi-projets.
 
 ## Contenu du Dépôt
-* **Python/** : Scripts et Dockerfile du TP python.
+* **Python/** : Scripts et tests unitaires , Dockerfile et docker compose du TP python.
 * **Wordpress/** : Configuration Docker Compose pour le déploiement WordPress.
 * **.github/workflows/main.yml** : Workflow centralisé pour la génération des artefacts.
 
