@@ -5,6 +5,7 @@ Cette branche contient la version finalisée du TP WordPress . La structure a é
 ## Modifications de Structure
 Contrairement à la branche `main`, les fichiers de configuration sont situés à la racine pour faciliter l'exécution directe des commandes Docker.
 
+
 ## CI/CD spécifique
 Le workflow sur cette branche (`.github/workflows/wordpress-ci-cd.yml`) a été modifié pour :
 * **Trigger** : S'activer sur la branche `wordpress-only`.
