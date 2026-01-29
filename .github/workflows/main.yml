@@ -1,18 +1,15 @@
 name: WordPress Kube CI/CD
 on:
   push:
-    branches: [ main , wordpress-only]
+    branches: [ wordpress-only]
   pull_request:
-    branches: [ main , wordpress-only]
+    branches: [ wordpress-only]
 
 jobs:
   # GÉNÉRATION DES MANIFESTES (CI)
   build-and-convert:
     name: Build & Kompose Conversion
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./Wordpress
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
@@ -41,7 +38,7 @@ jobs:
         uses: actions/upload-artifact@v4  
         with:
           name: wp-zip-payload
-          path: Wordpress/deploy_folder/
+          path: deploy_folder/
   # Déploiement (CD)
   deploy:
     name: Déploiement FTP (OVH)
