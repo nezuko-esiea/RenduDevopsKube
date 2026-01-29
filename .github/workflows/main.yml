@@ -1,9 +1,9 @@
 name: WordPress Kube CI/CD
 on:
   push:
-    branches: [ main ]
+    branches: [ main , wordpress-only]
   pull_request:
-    branches: [ main ]
+    branches: [ main , wordpress-only]
 
 jobs:
   # GÉNÉRATION DES MANIFESTES (CI)
