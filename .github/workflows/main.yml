@@ -2,6 +2,7 @@ name: WordPress Kube CI/CD
 on:
   push:
     branches: [ wordpress-only]
+    
   pull_request:
     branches: [ wordpress-only]
 
